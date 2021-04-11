@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.bag_serve.entity.FileData;
 import com.example.bag_serve.service.FileDataService;
 import com.example.bag_serve.util.HandleData;
+import com.example.bag_serve.util.OrderUtil;
 import com.example.bag_serve.util.Scatter;
 import com.example.bag_serve.util.ScatterUtil;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,9 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.activation.FileDataSource;
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ import java.util.List;
  **/
 @RestController
 @CrossOrigin
-public class ScatterController {
+public class OrderController {
 
 //    存放当前组价值的字符串
     private static String profit;
@@ -47,8 +48,8 @@ public class ScatterController {
      * @param scatter
      * @return
      */
-    @PostMapping("/get/scatter/data")
-    public Object getScatterData(@RequestBody Scatter scatter) {
+    @PostMapping("/order")
+    public Object order(@RequestBody Scatter scatter) {
         JSONObject jsonObject = new JSONObject();
         int count = fileDataService.count(null);
         if(count==0){
@@ -63,17 +64,19 @@ public class ScatterController {
                 return jsonObject;
             }
         }
-        ArrayList<ScatterUtil> scatterUtils = handleDataBase(fileName, group);
-
-        if (scatterUtils.size()>0) {
+        HandleData handleData = handleDataBase(fileName, group);
+        ArrayList<ScatterUtil> scatterUtils = new ArrayList<>();
+        handleData.splitDataTwoGroup(profitList,weightList,scatterUtils);
+//        返回前端的数据列表
+        ArrayList<OrderUtil> orderUtils = new ArrayList<>();
+        splitThreeGroup(scatterUtils, orderUtils);
+        if (orderUtils.size()>0) {
             jsonObject.put("status",200);
-            jsonObject.put("data",scatterUtils);
+            jsonObject.put("data",orderUtils);
         }else {
             jsonObject.put("status",203);
         }
         return jsonObject;
-
-
     }
 
     /**
@@ -82,7 +85,7 @@ public class ScatterController {
      * @param group
      * @return
      */
-    private ArrayList<ScatterUtil> handleDataBase(String fileName, Integer group) {
+    private HandleData handleDataBase(String fileName, Integer group) {
 //        先清空之前的数据
         profit=null;
         weight=null;
@@ -97,9 +100,25 @@ public class ScatterController {
         HandleData handleData = new HandleData();
         handleData.splitDataIntoInteger(profitList,profit);
         handleData.splitDataIntoInteger(weightList,weight);
-        ArrayList<ScatterUtil> scatterUtils = new ArrayList<>();
-        handleData.splitDataTwoGroup(profitList,weightList,scatterUtils);
-        return scatterUtils;
+        return handleData;
+    }
+
+    /**
+     * 将数据分为三三一组，并排序
+     * @param scatterUtils
+     * @param orderUtils
+     */
+    private void splitThreeGroup(ArrayList<ScatterUtil> scatterUtils, ArrayList<OrderUtil> orderUtils) {
+        for (int i = 0; i < scatterUtils.size(); i=i+3) {
+//            封装数据
+            OrderUtil orderUtil = new OrderUtil();
+            List<ScatterUtil> item = scatterUtils.subList(i, i + 3);
+            orderUtil.setItem(item);
+            float rate = (float) item.get(2).getProfit() / item.get(2).getWeight();
+            orderUtil.setRate(rate);
+            orderUtils.add(orderUtil);
+        }
+        Collections.sort(orderUtils);
     }
 
     /**
