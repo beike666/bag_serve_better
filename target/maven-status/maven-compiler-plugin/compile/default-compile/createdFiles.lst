@@ -1,0 +1,8 @@
+com\example\bag_serve\BagServeApplication.class
+com\example\bag_serve\controller\FileController.class
+com\example\bag_serve\util\OrderUtil.class
+com\example\bag_serve\config\WebMvcConfigurer.class
+com\example\bag_serve\entity\Scatter.class
+com\example\bag_serve\util\ScatterUtil.class
+com\example\bag_serve\config\FileConfig.class
+com\example\bag_serve\util\AnswerUtil.class
