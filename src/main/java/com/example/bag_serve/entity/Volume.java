@@ -12,27 +12,24 @@ import lombok.experimental.Accessors;
  * @program: bag_serve
  * @description
  * @author: BeiKe
- * @create: 2021-04-10 18:32
+ * @create: 2021-04-11 17:46
  **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Accessors( chain = true)
-public class FileData {
+public class Volume {
 
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-//    数据
-    private String data;
+    //    数据
+    private Integer volume;
 
-//    是重量还是价值
-    private Integer type;
-
-//    第几组
+    //    第几组
     private Integer team;
 
-//    哪个文件
+    //    哪个文件
     private String file;
 }

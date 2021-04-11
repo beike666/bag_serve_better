@@ -1,4 +1,4 @@
-package com.example.bag_serve.entity;
+package com.example.bag_serve.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

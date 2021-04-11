@@ -2,8 +2,7 @@ package com.example.bag_serve.controller;
 
 import com.alibaba.fastjson.JSONObject;
 
-import com.example.bag_serve.entity.FileData;
-import com.example.bag_serve.entity.Scatter;
+import com.example.bag_serve.util.Scatter;
 import com.example.bag_serve.util.AnswerUtil;
 import com.example.bag_serve.util.OrderUtil;
 import com.example.bag_serve.util.ScatterUtil;
@@ -39,38 +38,7 @@ public class FileController {
     private static ArrayList<String> profits=new ArrayList<>();
     private static ArrayList<String> weights=new ArrayList<>();
 
-    /**
-     * 前端请求散点图数据
-     * @param scatter
-     * @return
-     */
-    @PostMapping("/get/scatter/data")
-    public Object getScatterData(@RequestBody Scatter scatter){
-        JSONObject jsonObject = new JSONObject();
 
-//        传的数据不满足要求，返回失败
-        if(!scatter.getFileName().equals("idkp1-10.txt")){
-            if(scatter.getGroup()==11){
-                jsonObject.put("status",202);
-                return jsonObject;
-            }
-        }
-//        将创建好的数据传递给前端
-        ArrayList<ScatterUtil> scatterUtils = new ArrayList<>();
-//        将数据分割成【重量，价值】的数组
-        splitDataTwoGroup(scatter, scatterUtils);
-
-//        返回结果
-        if(scatterUtils.size()>0){
-            jsonObject.put("status",200);
-            jsonObject.put("data",scatterUtils);
-            return jsonObject;
-        }
-        jsonObject.put("status",201);
-        jsonObject.put("data",null);
-        return jsonObject;
-
-    }
 
     /**
      * 非递增排序
@@ -130,14 +98,14 @@ public class FileController {
         Integer group = scatter.getGroup();
         readFile(fileName,group,profitsList,weightsList);
 //        获取当前组的容量
-        int volume=volumeCount(scatter.getFileName(),scatter.getGroup());
+//        int volume=volumeCount(scatter.getFileName(),scatter.getGroup());
         long startTime=0;
         int answer=0;
         long endTime=0;
         if(scatter.getType()==0){
 //            采用动态规划算法
             startTime=System.currentTimeMillis();   //获取开始时间
-            answer=dp(profitsList,weightsList,volume);
+//            answer=dp(profitsList,weightsList,volume);
             endTime=System.currentTimeMillis(); //获取结束时间
             jsonObject.put("status",200);
             jsonObject.put("answer",answer);
@@ -146,7 +114,7 @@ public class FileController {
         }else{
 //            采用回溯算法
             startTime=System.currentTimeMillis();   //获取开始时间
-            answer=back(profitsList,weightsList,volume);
+//            answer=back(profitsList,weightsList,volume);
             endTime=System.currentTimeMillis(); //获取结束时间
             jsonObject.put("status",200);
             jsonObject.put("answer",answer);
@@ -169,7 +137,7 @@ public class FileController {
 //        读取文件
         readFile(dataFileName,group,profitsList,weightsList);
 //        获取当前组的容量
-        int volume=volumeCount(scatter.getFileName(),scatter.getGroup());
+//        int volume=volumeCount(scatter.getFileName(),scatter.getGroup());
         long startTime=0;
         int answer=0;
         long endTime=0;
@@ -192,7 +160,7 @@ public class FileController {
         if(scatter.getType()==0){
 //            采用动态规划算法
             startTime=System.currentTimeMillis();   //获取开始时间
-            answer=dp(profitsList,weightsList,volume);
+//            answer=dp(profitsList,weightsList,volume);
             endTime=System.currentTimeMillis(); //获取结束时间
             runTime=(endTime-startTime)/1000.0;
             if(suffix.equals(".txt")){
@@ -213,7 +181,7 @@ public class FileController {
         }else{
 //            采用回溯算法
             startTime=System.currentTimeMillis();   //获取开始时间
-            answer=back(profitsList,weightsList,volume);
+//            answer=back(profitsList,weightsList,volume);
             endTime=System.currentTimeMillis(); //获取结束时间
             runTime=(endTime-startTime)/1000.0;
             if(suffix.equals(".txt")){
@@ -380,7 +348,7 @@ public class FileController {
     @SneakyThrows
     public void readFile(String fileName,Integer group,ArrayList<Integer> profitsList,ArrayList<Integer> weightsList) {
 //        清洗数据
-        clearData();
+//        clearData();
 
 
 //        分割数据为整形
@@ -404,76 +372,7 @@ public class FileController {
         }
     }
 
-    /**
-     * 将文件中的特定数据读取到列表中
-     * @throws IOException
-     */
-    private static void clearData(String fileName) throws IOException {
-        //        所有数据文件的公共路径
-        String publicFilePath=System.getProperty("user.dir")+System.getProperty("file.separator")
-                +"data";
-        //具体文件路径
-        String filePath=publicFilePath+System.getProperty("file.separator")+fileName;
-//        创建一个文件对象
-        File file = new File(filePath);
 
-//        用BufferedReader类来进行读取内容
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String s=null;
-//            读取数据的标志字符串
-        String profit="The profit of items are:";
-        String weight="The weight of items are:";
-//            读取数据的标志位
-        int flag1=0;
-        int flag2=0;
-        while ((s = reader.readLine()) != null) {
-            if (s.contains(profit)) {
-                flag1=1;
-                continue;
-            }else if (s.contains(weight)) {
-                flag2=1;
-                continue;
-            }
-            if(flag1==1){
-                profits.add(s);
-                flag1=0;
-            }else if(flag2==1){
-                weights.add(s);
-                flag2=0;
-            }
-        }
-    }
-
-    /**
-     * 获取具体某组数据的容量
-     * @param fileName
-     * @param group
-     * @return
-     */
-    @SneakyThrows
-    private int volumeCount(String fileName, Integer group){
-        //        所有数据文件的公共路径
-        String publicFilePath=System.getProperty("user.dir")+System.getProperty("file.separator")
-                +"data";
-        //具体文件路径
-        String filePath=publicFilePath+System.getProperty("file.separator")+fileName;
-//        创建一个文件对象
-        File file = new File(filePath);
-
-//        用BufferedReader类来进行读取内容
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String s=null;
-        String volumeWord="the cubage of knapsack is";
-        ArrayList<Integer> volumes = new ArrayList<>();
-        while ((s = reader.readLine()) != null) {
-            if(s.contains(volumeWord)){
-                String[] s1 = s.split(" ");
-                String replace = s1[s1.length - 1].replace(".", "");
-                volumes.add(Integer.parseInt(replace));
-            }
-        }
-        return volumes.get(group-1);
-    }
 
 
     /**
