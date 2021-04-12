@@ -21,7 +21,7 @@ public class HandleFile {
      * @param data
      * @return
      */
-    public String writeTxt(File file, String data){
+    public String writeFile(File file, String data){
         Writer writer=null;
         try {
             writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");

@@ -106,7 +106,7 @@ public class AnswerAndSaveController {
         if (suffix.equals(".txt")) {
             String data = "最优解：" + answer + "\n" +
                     "求最优解的时间：" + runTime + "\n";
-            handleFile.writeTxt(fileUtil.getFile(), data);
+            handleFile.writeFile(fileUtil.getFile(), data);
         } else if (suffix.equals(".xlsx")) {
             AnswerUtil answerUtil = new AnswerUtil();
             answerUtil.setAnswer(answer);
@@ -120,6 +120,11 @@ public class AnswerAndSaveController {
         return jsonObject;
     }
 
+    /**
+     * 创建实验数据的存储文件
+     * @param suffix
+     * @return
+     */
     private FileUtil createFile(String suffix) {
         //文件路径
         String filePath=System.getProperty("user.dir")+System.getProperty("file.separator")
