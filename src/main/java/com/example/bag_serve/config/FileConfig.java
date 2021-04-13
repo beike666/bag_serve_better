@@ -21,5 +21,11 @@ public class FileConfig implements WebMvcConfigurer {
                                 System.getProperty("file.separator")+
                                 "file"+System.getProperty("file.separator")
                         );
+        registry.addResourceHandler("/code/**").
+                addResourceLocations(
+                        "file:"+System.getProperty("user.dir")+
+                                System.getProperty("file.separator")+
+                                "code"+System.getProperty("file.separator")
+                );
     }
 }
