@@ -97,9 +97,6 @@ public class DataBaseController {
      */
     private void insertDataBase(Result result) {
         for (String profit : result.getProfits()) {
-            System.out.println(profit);
-        }
-        for (String profit : result.getProfits()) {
             FileData fileData = new FileData();
             fileData.setData(profit);
             fileData.setType(1);
